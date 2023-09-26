@@ -1,0 +1,8 @@
+Species		wt%		a_coeff
+MgO(l)		0.369	1
+CaO(l)		0.033	1
+Al2O3(l)	0.046	1
+SiO2(l)		0.507	1
+Na2O(l)		0.003	1.00E-06
+K2O(l)		0.0003	1.00E-08
+FeO(l)		0.035	1
