@@ -1,0 +1,67 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+form {
+    max-width: 400px;
+    background-color: #EEEFF1;
+    border-radius: 15px;
+    margin: 0 auto;  /* auto brings it to the center*/
+    padding: 25px;
+    color: #3d414a;
+}
+
+label {
+    display: block;
+    margin-top: 10px;
+}
+
+.field{
+    width: 94%; 
+    font-size: 18px;
+    padding: 5px 10px;
+    border-radius: 10px;
+    border: none;
+}
+
+.field:focus{
+    outline: solid 1px #5762D5;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="date"],
+input[type="password"],
+input[type="file"],
+input[type="radio"],
+textarea {
+    width: 100%;
+    padding: 8px;
+    border-radius: 15px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    margin-top: 5px;
+    border: none;
+}
+
+input[type="checkbox"] {
+    margin-top: 10px;
+}
+
+input[type="submit"] {
+    font-size: medium;
+    background-color: #5762D5;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    margin-top: 10px;
+    width:  100%;
+    transition-duration: 0.5s;
+}
+
+input[type="submit"]:hover {
+    background-color: #4ee2bd;
+}

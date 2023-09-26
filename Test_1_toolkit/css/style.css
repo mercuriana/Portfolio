@@ -1,0 +1,114 @@
+
+/* ---------------------------------------- */
+/* Notes: */
+/*      tag{}               */
+/*      .class {}           */
+/*      #id {}              */
+/* ---------------------------------------- */
+/* Dark blue: #141f2f */
+/* Orange: #de7b56 */
+/* Grey:  #d3d0cc*/
+body{
+    font-size: 100%;
+    font-family: Arial;
+    margin: 0;    
+}
+.body-dark{
+    background-color: #1E1E1E;
+    color: white;
+}
+/* ---------------------------------------- */
+/* --------- navigation bar style --------- */
+/* ---------------------------------------- */
+header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    box-shadow: 0px 10px 25px #00000043;
+    background-color: white;
+}
+/* #logo{
+    padding: 0 0 0 50px;
+} */
+
+
+#selected-home{color:#de7b56;}
+#selected-account{color:#de7b56;}
+
+header a:hover{
+    color: #4ee2bd;
+}
+
+.main-nav a{
+    font-size: 20px;
+    color: rgb(72, 75, 74);
+    text-decoration: none;
+    transition-duration: 0.3s; 
+    padding: 100px 0 0 50px;
+}
+
+header svg{
+    padding: 0 0 0 45px;
+}
+header svg:hover{
+    cursor: pointer;
+}
+
+
+/*     padding: 0 0 0 50px;
+    padding-top: 0px;*/
+
+/*.p1 {
+    font-family: Arial, Helvetica, sans-serif;
+} */
+
+/* ----------------------------------------------- */
+/* ------------------ Main - Tools --------------- */
+/* ----------------------------------------------- */
+.card{
+    display: flex;
+    flex-direction: column;
+    width: 1000px;
+    margin: auto; /* Inside page in brings it to the center*/
+    gap: 30px 30px 30px 30px;
+}
+
+/* Style the counter cards */
+.tool_card {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    text-align: center;
+    background-color: #eceff5;
+    border-radius: 20px;
+    color: #1E1E1E;
+    width: 500px;
+    margin: auto; /* Inside main it centers content*/
+}
+
+.form-control{
+    width: 150px;
+}
+
+
+/* ---------------------------------------- */
+/* ---------------- Footer ---------------- */
+/* ---------------------------------------- */
+/* footer{
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100px; 
+    padding: 20px;
+    background-color: #2B2343;
+    text-align: center;
+    color: #E9E6F0;
+} */
+
+#footer {
+    margin-top: auto;
+    width: 100%;
+    height: 60px;   /* Height of the footer */
+    text-align: center;
+    background: #141f2f;
+ }

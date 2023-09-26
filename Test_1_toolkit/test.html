@@ -1,0 +1,54 @@
+<html>
+<head>
+    <title>Range Slider Line Plot - Chart.js</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div>
+        <input type="range" min="1" max="10" step="1" value="5" id="rangeSlider">
+    </div>
+    <canvas id="lineChart"></canvas>
+
+    <script>
+        // Get the range slider element
+        var rangeSlider = document.getElementById('rangeSlider');
+
+        // Create the initial line chart
+        var ctx = document.getElementById('lineChart').getContext('2d');
+        var lineChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                datasets: [{
+                    label: 'Line Chart',
+                    data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                    backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                    borderColor: 'rgba(0, 123, 255, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Update the chart when the range slider value changes
+        rangeSlider.addEventListener('input', function() {
+            var value = parseInt(this.value);
+
+            // Update the chart data
+            lineChart.data.datasets[0].data = Array.from({ length: 10 }, (_, i) => i + 1).map(function (x) {
+                return x * value;
+            });
+
+            // Update the chart
+            lineChart.update();
+        });
+    </script>
+</body>
+</html>
