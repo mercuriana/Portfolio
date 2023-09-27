@@ -1,4 +1,4 @@
-# portfolio
+# Portfolio
 This repository contains a collection of sample code I've crafted to serve various purposes .
 
 - Agent-Based Model: (Python, Pandas, SciPy) Multi-period agent-based model and simulation of agents that buy, sell, and stake tokens as sell as earn them through a task verification process.
