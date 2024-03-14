@@ -66,20 +66,20 @@ from scipy.stats import truncnorm
 ## (a) Remaining ITE with lockup period > 0
 ## (b) Remaining ITE with lockup period > 12
 #############################################################################
-#rm_mod = [123.3, 17.3, 17.3, 17.3, 17.3, 17.3, 24.3, 20.1, 20.1, 20.1, 20.1,
+#rm_TOK = [123.3, 17.3, 17.3, 17.3, 17.3, 17.3, 24.3, 20.1, 20.1, 20.1, 20.1,
 #          20.1, 24.5, 16.2, 16.2, 16.2, 16.2, 16.2, 16.2, 16.2, 16.2, 16.2,
 #          16.2, 16.2, 16.2, 12.0, 12.0, 12.0, 12.0, 12.0, 12.0, 12.0, 12.0,
 #          12.0, 12.0, 12.0, 12.0, 12.0, 12.0, 12.0, 12.0, 12.0, 12.0, 9.3,
 #          9.3, 9.3, 9.3, 9.3] # with reserve
-# Monthly release MOD without including reserve:
-rm_mod = [119.5, 13.490, 13.490, 13.490, 13.490, 13.490, 20.490, 16.226, 16.226,
+# Monthly release TOK without including reserve:
+rm_TOK = [119.5, 13.490, 13.490, 13.490, 13.490, 13.490, 20.490, 16.226, 16.226,
           16.226, 16.226, 16.226, 20.670, 12.337, 12.337, 12.337, 12.337, 12.337,
           12.337, 12.337, 12.337, 12.337, 12.337, 12.337, 12.337, 8.170, 8.170,
           8.170, 8.170, 8.170, 8.170, 8.170, 8.170, 8.170, 8.170, 8.170, 8.170,
           8.170, 8.170, 8.170, 8.170, 8.170, 8.170, 5.434, 5.434, 5.434, 5.434,
           5.434, 0.990]        # without reserve
-monthly_released_mod = [item * 1e6 for item in rm_mod]
-mm = monthly_released_mod
+monthly_released_TOK = [item * 1e6 for item in rm_TOK]
+mm = monthly_released_TOK
 #------------------------
 # (a) Lockup period > 0:
 #------------------------
@@ -105,7 +105,7 @@ y2 = res_13
 plt.plot(x,y, linestyle="",marker="o")
 plt.plot(x, y2,linestyle="",marker="o")
 plt.xlabel('Months')
-plt.ylabel('Remaining MOD tokens')
+plt.ylabel('Remaining TOK tokens')
 lab= ["Lockup period > 0","Lockup period > 12"]
 plt.legend(lab)
 plt.show()
@@ -156,8 +156,8 @@ msenior_rew = []
 mjunior_rew = []
 liquid_in_period = [] # only from moderation
 # Endowment:
-endowment = monthly_released_mod
-# Daily release MOD from Reserve for the fist 4 years
+endowment = monthly_released_TOK
+# Daily release TOK from Reserve for the fist 4 years
 daily_reserve = 125770 #@param {type:"number"}
 # Initial price in cents:
 initial_price = 3#@param {type:"number"}
@@ -229,7 +229,7 @@ Nt_steps = 1 #@param {type:"number"}
 # Cost per task in dollars (USD):
 task_usd_dollars =  1#@param {type:"number"}
 task_cents = task_usd_dollars*100
-# Cost per moderator (MOD):
+# Cost per moderator (TOK):
 Cs = 5 #@param {type:"number"}
 multiplier = 100000 #@param {type:"number"}
 # Exponent for seniors stake:
@@ -271,7 +271,7 @@ Normal distribution
 """
 
 #########################################
-## USDT or MOD
+## USDT or TOK
 #########################################
 def money_normal(mean, sigma):
     x = np.random.normal(mean, sigma)
@@ -322,7 +322,7 @@ def desperate_sellers(sellers_DF, idx_period):
     if vals <= 0:
       print('I found a desperate seller')
       sellers_DF.loc[i, 'status'] = 'desperate'
-  sum_desp = sellers_DF.loc[sellers_DF['status']=='desperate', 'Q_MOD'].sum()
+  sum_desp = sellers_DF.loc[sellers_DF['status']=='desperate', 'Q_TOK'].sum()
   print(f"number of sellers potentially selling next period: {sum_next}")
   return sellers_DF, sum_desp
 ##################################################
@@ -370,14 +370,14 @@ def generate_buyers(nb_mean, price, period_index, QU_mean, QU_sd, alpha_loc,
     #####################################################
     bid_price = price[period_index] + alpha_b[j]
     ask_price = np.nan
-    Q_MOD = Q_USDT[j]/bid_price
+    Q_TOK = Q_USDT[j]/bid_price
     #alock[j] = round(random.randint(a_min, a_max*100)/100, 2)
 
     buy_states.append([alpha_b[j], bid_price, Q_USDT[j], alpha_s[j],
-                       ask_price, Q_MOD, TC[j], alock[j], bunlock[j], int(lockt[j])])
+                       ask_price, Q_TOK, TC[j], alock[j], bunlock[j], int(lockt[j])])
   df_buy = pd.DataFrame(buy_states, columns=["alpha_buy","bid_price",
                                              "Q_USDT", "alpha_sell",
-                                             "ask_price", "QB_MOD",
+                                             "ask_price", "QB_TOK",
                                              "critical_time", "beta_lock",
                                              "beta_unlock", "dissolve_delay"])
   A_DF = df_buy.sort_values(by=["bid_price"], ascending=False) # highest to lowest
@@ -397,7 +397,7 @@ def generate_buyers(nb_mean, price, period_index, QU_mean, QU_sd, alpha_loc,
 def generate_sellers(idx, price, period_index, buyers_DF):
   sell_states = []
   sell_USDT = buyers_DF.loc[0:idx, 'Q_USDT']
-  MOD_sellers = sell_USDT/price[period_index]
+  TOK_sellers = sell_USDT/price[period_index]
   alpha = buyers_DF.loc[0:idx, 'alpha_sell']
   time_c = buyers_DF.loc[0:idx, 'critical_time']
   al = buyers_DF.loc[0:idx, 'beta_lock']
@@ -412,7 +412,7 @@ def generate_sellers(idx, price, period_index, buyers_DF):
     sell_states.append([alpha[i], sell_price])
 
   sellers_DF = pd.DataFrame(sell_states, columns=['alpha_sell', 'ask_price'])
-  sellers_DF['Q_MOD'] = MOD_sellers
+  sellers_DF['Q_TOK'] = TOK_sellers
   sellers_DF['critical_time']= time_c
   sellers_DF['beta_lock'] = al
   sellers_DF['beta_unlock'] = bl
@@ -439,7 +439,7 @@ def cumulative_sd(nb, ns, buyers_DF, sellers_DF, sum_desp, endowment, moderation
   price = buyers_DF['bid_price']
   buyers_DF['cumulative_demand'] = cumulative_usdt/price
   # SUPPLY:
-  sellers_supply = np.cumsum(sellers_DF.loc[sellers_DF['status']=='trader', 'Q_MOD'])
+  sellers_supply = np.cumsum(sellers_DF.loc[sellers_DF['status']=='trader', 'Q_TOK'])
   if len(sellers_supply)==0:
     sellers_DF['cumulative_supply'] = endowment - moderation
   else:
@@ -460,7 +460,7 @@ import copy
 def update_sellers(price,j,buyer_idx, seller_idx, buyers_DF,sellers_DF, rem_usdt):
   #buyers_DF.loc[buyer_idx, 'Q_USDT'] = rem_usdt
   sell_USDT = buyers_DF.loc[0:buyer_idx, 'Q_USDT']
-  MOD_sellers = sell_USDT/price[j]
+  TOK_sellers = sell_USDT/price[j]
   alsell = buyers_DF.loc[0:buyer_idx, 'alpha_sell']
   critime = buyers_DF.loc[0:buyer_idx, 'critical_time']
   al = buyers_DF.loc[0:buyer_idx, 'beta_lock']
@@ -476,7 +476,7 @@ def update_sellers(price,j,buyer_idx, seller_idx, buyers_DF,sellers_DF, rem_usdt
   new_sellers = pd.DataFrame(s_price, columns=["ask_price"])
 
   new_sellers['alpha_sell'] = alsell
-  new_sellers['Q_MOD'] = MOD_sellers
+  new_sellers['Q_TOK'] = TOK_sellers
   new_sellers['critical_time'] = critime - 1
   new_sellers['beta_lock'] = al
   new_sellers['beta_unlock'] = bl
@@ -496,7 +496,7 @@ def update_sellers(price,j,buyer_idx, seller_idx, buyers_DF,sellers_DF, rem_usdt
   old_alpha = sellers_DF.loc[seller_idx:end-1,'alpha_sell']
   old_sellers = pd.DataFrame(old_alpha, columns=["alpha_sell"])
 
-  old_MOD = sellers_DF.loc[seller_idx:end-1,'Q_MOD']
+  old_TOK = sellers_DF.loc[seller_idx:end-1,'Q_TOK']
   old_critime = sellers_DF.loc[seller_idx:end-1,'critical_time']
   old_alock = sellers_DF.loc[seller_idx:end-1,'beta_lock']
   old_bunlock = sellers_DF.loc[seller_idx:end-1,'beta_unlock']
@@ -513,7 +513,7 @@ def update_sellers(price,j,buyer_idx, seller_idx, buyers_DF,sellers_DF, rem_usdt
     sell_price[i] = price[j] + vals
 
   old_sellers['ask_price'] = sell_price
-  old_sellers['Q_MOD'] = old_MOD
+  old_sellers['Q_TOK'] = old_TOK
   #print('Old critical time:', old_critime)
   old_sellers['critical_time'] = copy.deepcopy(old_critime - 1)
   #print('New critical time, ', old_sellers['critical_time'])
@@ -530,7 +530,7 @@ def update_sellers(price,j,buyer_idx, seller_idx, buyers_DF,sellers_DF, rem_usdt
   #------------------------------
   s_frames = [new_sellers, old_sellers]
   next_sellers = pd.concat(s_frames)
-  #next_sellers.dropna(subset = ["Q_MOD"], inplace=True)
+  #next_sellers.dropna(subset = ["Q_TOK"], inplace=True)
   next_sellers = new_sellers.sort_values(by=["ask_price"]) # lowest to highest
   next_sellers = next_sellers.reset_index()
   return next_sellers
@@ -548,10 +548,10 @@ def eq_price(buyers_DF, sellers_DF):
   buy = pd.DataFrame()
   sell = pd.DataFrame()
   buy['price'] = buyers_DF['bid_price']
-  buy['qty_buyers'] = buyers_DF['QB_MOD']
+  buy['qty_buyers'] = buyers_DF['QB_TOK']
   buy['cum_qty_buyers'] = buyers_DF['cumulative_demand']
   sell['price'] = sellers_DF['ask_price']
-  sell['qty_sellers'] = sellers_DF['Q_MOD']
+  sell['qty_sellers'] = sellers_DF['Q_TOK']
   sell['cum_qty_sellers'] = sellers_DF['cumulative_supply']
   market=pd.merge(buy.sort_values("price", ascending=True).reset_index(drop=True),
                 sell, on="price", how ="outer", suffixes=
@@ -586,8 +586,6 @@ def plot_alpha(A_DF, i):
     ax.set_title(r'Half-normal distribution, $\alpha^b \in H-ND(\mu_0=-3, \sigma=2)$')
     plt.xlabel('Alpha Buy')
     plt.ylabel('Frecuency')
-    #images_dir = '/drive/My Drive/Projects/MODCLUB/ABM_results' #--> Replace path with your own
-    #plt.savefig(f"{images_dir}/alpha_buy_histogram_period%s.png" %i)
   # ALPHA SELL
   else:
     fig = plt.figure(figsize=(8,6), dpi=100)
@@ -599,8 +597,6 @@ def plot_alpha(A_DF, i):
     ax.set_title(r'Negative Half-normal distribution, $\alpha^s \in -H-ND(\mu_0=-3, \sigma=2)$')
     plt.xlabel('Alpha Sell')
     plt.ylabel('Frecuency')
-    #images_dir = '/drive/My Drive/Projects/MODCLUB/ABM_results' #--> Replace path with your own
-    #plt.savefig(f"{images_dir}/alpha_sell_histogram_period%s.png" %i)
   return plt
 #-----------------------------------------------------------------------------
 #plot_alpha(buyers_DF)
@@ -619,22 +615,18 @@ def plot_usdt(A_DF, i):
     ax.set_title(r'Normal distribution, $Q^U \in  ND(\mu=5e6, \sigma=5e5)$ cents')
     plt.xlabel('Quantity (USDT cents)')
     plt.ylabel('Frecuency')
-    #images_dir = '/drive/My Drive/Projects/MODCLUB/ABM_results' #--> Replace path with your own
-    #plt.savefig(f"{images_dir}/Q_USDT_histogram_%s.png"%i)
     return plt
 #-----------------------------------------------------------------------------
 #plot_usdt(buyers_DF)
 
 #-----------------------------------------------------------------------------
-# MOD HISTOGRAM
+# TOK HISTOGRAM
 #-----------------------------------------------------------------------------
-def plot_MOD(A_DF, i):
+def plot_TOK(A_DF, i):
     fig = plt.figure(figsize=(8,6), dpi=100)
-    plt.hist(A_DF['Q_MOD'], 30)
-    plt.xlabel('Quantity (MOD)')
+    plt.hist(A_DF['Q_TOK'], 30)
+    plt.xlabel('Quantity (TOK)')
     plt.ylabel('Frecuency')
-    #images_dir = '/drive/My Drive/Projects/MODCLUB/ABM_results' #--> Replace path with your own
-    #plt.savefig(f"{images_dir}/Q_MOD_histogram_%s.png" %i)
     #return plt
 
 #-----------------------------------------------------------------------------
@@ -651,8 +643,6 @@ def price_distribution(A_DF, i, price):
     plt.hist(A_DF['bid_price'], 30)
     plt.xlabel('Bid price')
     plt.ylabel('Frecuency')
-    #images_dir = '/drive/My Drive/Projects/MODCLUB/ABM_results' #--> Replace path with your own
-    #plt.savefig(f"{images_dir}/bid_price_histogram_period%s.png" %i)
     plt.show()
   else:
   # SELLERS PRICE
@@ -664,8 +654,6 @@ def price_distribution(A_DF, i, price):
     plt.hist(A_DF['ask_price'], 30)
     plt.xlabel('Ask price')
     plt.ylabel('Frecuency')
-    #images_dir = '/drive/My Drive/Projects/MODCLUB/ABM_results' #--> Replace path with your own
-    #plt.savefig(f"{images_dir}/ask_price_histogram_period%s.png" %i)
     plt.show()
   return plt
 
@@ -681,8 +669,6 @@ def critical_time(A_DF,i):
   plt.hist(A_DF['critical_time'], 30)
   plt.xlabel('Months')
   plt.ylabel('Frecuency')
-  #images_dir = '/drive/My Drive/Projects/MODCLUB/ABM_results' #--> Replace path with your own
-  #plt.savefig(f"{images_dir}/critical_time_histogram_period%s.png" %i)
   plt.show()
   return plt
 
@@ -698,8 +684,6 @@ def alo(A_DF,i):
   plt.hist(A_DF['beta_lock'], 30)
   plt.xlabel('Beta lock')
   plt.ylabel('Frecuency')
-  #images_dir = '/drive/My Drive/Projects/MODCLUB/ABM_results' #--> Replace path with your own
-  #plt.savefig(f"{images_dir}/beta_lock_histogram_period%s.png" %i)
   plt.show()
   return plt
 
@@ -715,8 +699,6 @@ def bun(A_DF,i):
   plt.hist(A_DF['beta_unlock'], 30)
   plt.xlabel('Beta unlock')
   plt.ylabel('Frecuency')
-  #images_dir = '/drive/My Drive/Projects/MODCLUB/ABM_results' #--> Replace path with your own
-  #plt.savefig(f"{images_dir}/beta_unlock_histogram_period%s.png" %i)
   plt.show()
   return plt
 
@@ -732,8 +714,6 @@ def loti(A_DF,i):
   plt.hist(A_DF['dissolve_delay'], bins=20)
   plt.xlabel('Months')
   plt.ylabel('Frecuency')
-  #images_dir = '/drive/My Drive/Projects/MODCLUB/ABM_results' #--> Replace path with your own
-  #plt.savefig(f"{images_dir}/dissolve_delay_histogram_period%s.png" %i)
   plt.show()
   return plt
 
@@ -748,8 +728,6 @@ def order_book(buyers_DF, sellers_DF, i):
   plt.ylabel('Number of agents)')
   labels= ["Buy Price","Sell Price"]
   plt.legend(labels)
-  #images_dir = '/drive/My Drive/Projects/MODCLUB/ABM_results' #--> Replace path with your own
-  #plt.savefig(f"{images_dir}/order_book_depth_chart_period%s.png" %i)
   plt.show
   return plt
 
@@ -778,8 +756,6 @@ def plot_supply_demand(buyers_DF, sellers_DF, endowment, moderation, i):
   plt.title(f'Supply and Demand, period={i}')
   plt.xlabel('Quantity')
   plt.ylabel('Price')
-  #images_dir = '/drive/My Drive/Projects/MODCLUB/ABM_results' #--> Replace path with your own
-  #plt.savefig(f"{images_dir}/supply_demand_period%s.png" %i)
   plt.show()
   return plt
 
@@ -793,10 +769,8 @@ def plot_liquid_staked(liquid, total_staked, e):
   plt.plot(mot, liquid,marker="o")
   plt.title('Liquid vs. Staked tokens')
   plt.xlabel('Month')
-  plt.ylabel('MOD')
-  plt.legend(['Total MOD Staked','Liquid MOD'])
-  #images_dir = '/drive/My Drive/Projects/MODCLUB/ABM_results' #--> Replace path with your own
-  #plt.savefig(f"{images_dir}/Liquid_vs_Staked_%s.png" %e)
+  plt.ylabel('TOK')
+  plt.legend(['Total TOK Staked','Liquid TOK'])
   plt.show()
   return plt
 
@@ -825,8 +799,6 @@ def plot_agents(n_buy,n_sell,n_desp,n_dissol, e):
   ax.set_xlabel('Month')
   ax2.set_ylabel('Number of sellers, critical sellers, dissolvers')
 
-  #images_dir = '/drive/My Drive/Projects/MODCLUB/ABM_results' #--> Replace path with your own
-  #fig.savefig(f"{images_dir}/Number_agents_epoch%s.png" %e)
   plt.show()
   return plt
 
@@ -844,8 +816,6 @@ def plot_p(price,cost_usd,e):
   #plt.title(r'Price, $P_0 =$ %s cents' %price[0])
   plt.xlabel('Month')
   plt.ylabel('Price [Cents]')
-  #images_dir = '/drive/My Drive/Projects/MODCLUB/ABM_results' #--> Replace path with your own
-  #plt.savefig(f"{images_dir}/Price_evolution_epoch%s.png" %e)
   plt.show()
   return plt
 ##################################################
@@ -862,9 +832,7 @@ def plot_vol(volume,e):
   plt.plot(mot, volume,marker="o")
   #plt.title('Volume Transacted')
   plt.xlabel('Month')
-  plt.ylabel('Volume transacted [MOD]')
-  #images_dir = '/drive/My Drive/Projects/MODCLUB/ABM_results' #--> Replace path with your own
-  #plt.savefig(f"{images_dir}/Volume_epoch%s.png" %e)
+  plt.ylabel('Volume transacted [TOK]')
   plt.show()
   return plt
 ##################################################
@@ -882,8 +850,6 @@ def plot_r_s(staking_reward,e):
   #plt.title('Annual percentage yield')
   plt.xlabel('Month')
   plt.ylabel('APY/100')
-  #images_dir = '/drive/My Drive/Projects/MODCLUB/ABM_results' #--> Replace path with your own
-  #plt.savefig(f"{images_dir}/APY_%s.png" %e)
   plt.show()
   return plt
 ##################################################
@@ -902,12 +868,9 @@ def plot_Q_s(total_staked,e_stk, stakers_stake, seniors_stake, e):
   plt.plot(mot, stakers_stake,marker="o")
   plt.plot(mot, seniors_stake,marker="o")
   plt.yscale("log")
-  #plt.title('Total MOD staked')
   plt.xlabel('Month')
   plt.ylabel('Log(Cumulative MOD staked)')
   plt.legend(['Total Staked','Remaining endowment', 'Staked by stakers', 'Seniors stake'])
-  #images_dir = '/drive/My Drive/Projects/MODCLUB/ABM_results' #--> Replace path with your own
-  #plt.savefig(f"{images_dir}/Total_MOD_staked_%s.png" %e)
   plt.show()
   return plt
 ##################################################
@@ -925,8 +888,6 @@ def plot_n_stk(n_stakers,e):
   #plt.title('New stakers in each month')
   plt.xlabel('Month')
   plt.ylabel('No. of new stakers')
-  #images_dir = '/drive/My Drive/Projects/MODCLUB/ABM_results' #--> Replace path with your own
-  #plt.savefig(f"{images_dir}/Number_new_stakers_%s.png" %e)
   plt.show()
   return plt
 ##################################################
@@ -941,8 +902,6 @@ def plot_stakers(c_stakers,e):
   plt.title('Cumulative number of stakers')
   plt.xlabel('Month')
   plt.ylabel('Number')
-  #images_dir = '/drive/My Drive/Projects/MODCLUB/ABM_results' #--> Replace path with your own
-  #plt.savefig(f"{images_dir}/Cumulative_number_stakers_%s.png" %e)
   plt.show()
   return plt
 ##################################################
@@ -957,18 +916,16 @@ def plot_stk(c_stk_all,c_endow,c_stkrs, e):
   plt.plot(mot, c_endow[0:e], marker="o")
   plt.plot(mot, c_stkrs[0:e], marker="o")
   plt.yscale("log")
-  plt.title('Cumulative MOD staked')
+  plt.title('Cumulative TOK staked')
   plt.xlabel('Month')
-  plt.ylabel('Log(Cumulative MOD staked)')
+  plt.ylabel('Log(Cumulative TOK staked)')
   plt.legend(['Total cumulative staked','Cumulative remaining endowment', 'Cumulative stakers'])
-  #images_dir = '/drive/My Drive/Projects/MODCLUB/ABM_results' #--> Replace path with your own
-  #plt.savefig(f"{images_dir}/Cumulative_MOD_staked_%s.png" %e)
   plt.show()
   return plt
 ##################################################
 
 ##################################################
-## PLOT MOD burned, moderation, treasury
+## PLOT TOK burned, moderation, treasury
 ##################################################
 def plot_split(burned,moderation,treasury, e):
   mot = np.arange(1,e+1)
@@ -981,16 +938,14 @@ def plot_split(burned,moderation,treasury, e):
   plt.plot(mot, burned,marker="o")
   #plt.title('Total cost split into $Q^m$, $Q^t$, and  $Q^b$')
   plt.xlabel('Month')
-  plt.ylabel('MOD')
+  plt.ylabel('TOK')
   plt.legend(['Moderation Rewards ($Q^m$)','To Treasury $Q^t$ ', 'Burned $Q^b$'])
-  #images_dir = '/drive/My Drive/Projects/MODCLUB/ABM_results' #--> Replace path with your own
-  #plt.savefig(f"{images_dir}/Total_cost_split_%s.png" %e)
   plt.show()
   return plt
 ##################################################
 
 ##################################################
-## PLOT MOD burned, moderation, treasury
+## PLOT TOK burned, moderation, treasury
 ##################################################
 def plot_mean_rewards(msenior_rew, mjunior_rew, e):
   mot = np.arange(1,e+1)
@@ -1002,10 +957,8 @@ def plot_mean_rewards(msenior_rew, mjunior_rew, e):
   plt.plot(mot, mjunior_rew,marker="o")
   plt.title('Cumulative average rewards per moderator per task')
   plt.xlabel('Month')
-  plt.ylabel('MOD')
+  plt.ylabel('TOK')
   plt.legend(['Senior','Junior'])
-  #images_dir = '/drive/My Drive/Projects/MODCLUB/ABM_results' #--> Replace path with your own
-  #plt.savefig(f"{images_dir}/Average_rewards_%s.png" %e)
   plt.show()
   return plt
 ##################################################
@@ -1024,8 +977,6 @@ def plot_number_tasks(number_tasks, multiplier, e):
   #plt.title('Number of tasks per month')
   plt.xlabel('Month')
   plt.ylabel('Number of tasks')
-  #images_dir = '/drive/My Drive/Projects/MODCLUB/ABM_results' #--> Replace path with your own
-  #plt.savefig(f"{images_dir}/Number_of_tasks_%s.png" %e)
   plt.show()
   return plt
 ##################################################
@@ -1053,8 +1004,6 @@ def plot_ratioburned(burned, liquid, e):
   plt.xlabel('Month')
   plt.ylabel('Ratio')
   plt.legend(['Burned/Tot supply ratio','Burned/Liquid ratio'])
-  #images_dir = '/drive/My Drive/Projects/MODCLUB/ABM_results' #--> Replace path with your own
-  #plt.savefig(f"{images_dir}/Burned_TotSupply_ratio_%s.png" %e)
   plt.show()
   return plt
 ##################################################
@@ -1075,8 +1024,6 @@ def plot_ratiostaked(liquid, total_staked, e):
   #plt.title('Ratio of burned to total supply')
   plt.xlabel('Month')
   plt.ylabel('Staked-Liquid Ratio')
-  #images_dir = '/drive/My Drive/Projects/MODCLUB/ABM_results' #--> Replace path with your own
-  #plt.savefig(f"{images_dir}/Staked_Liquid_ratio_%s.png" %e)
   plt.show()
   return plt, ratio
 ##################################################
@@ -1094,10 +1041,8 @@ def plot_burnedliquid(burned, liquid,rt,rm,rb, e):
   plt.plot(mot, liquid,marker="o")
   plt.yscale("log")
   plt.xlabel('Month')
-  plt.ylabel('MOD')
+  plt.ylabel('TOK')
   plt.legend(['Burned','Liquid'])
-  #images_dir = '/drive/My Drive/Projects/MODCLUB/ABM_results' #--> Replace path with your own
-  #plt.savefig(f"{images_dir}/Burned_TotSupply_ratio_%s.png" %e)
   plt.show()
   return plt
 ##################################################
@@ -1127,8 +1072,8 @@ def agent_status(sellers_DF, staking_pool, daily_reserve, seniors_staked,treasur
       #print('We have a staker in tha house!')
       #print("Alpha lock for this agent is: ", vals)
       sellers_DF.loc[i, 'status'] = 'staker'
-      sellers_DF.loc[i, 'Q_s'] = sellers_DF.loc[i, 'Q_MOD']
-      sellers_DF.loc[i, 'Q_MOD'] = 0
+      sellers_DF.loc[i, 'Q_s'] = sellers_DF.loc[i, 'Q_TOK']
+      sellers_DF.loc[i, 'Q_TOK'] = 0
       #print("Unlocking product: ", vals*b_unlock[i])
       #print("Previous staking reward: ", rs_prev)
     elif (sellers_DF.loc[i, 'status'] == 'staker') and (vals*b_unlock[i] > APY_prev):
@@ -1138,7 +1083,7 @@ def agent_status(sellers_DF, staking_pool, daily_reserve, seniors_staked,treasur
     elif (sellers_DF.loc[i, 'status'] == 'dissolver') and (idx_period == diss_del[i] + 1):
       #print('A dissolver gets their money back')
       sellers_DF.loc[i, 'status'] = 'trader'
-      sellers_DF.loc[i, 'Q_MOD'] = sellers_DF.loc[i, 'Q_s']
+      sellers_DF.loc[i, 'Q_TOK'] = sellers_DF.loc[i, 'Q_s']
       sellers_DF.loc[i, 'Q_s'] = 0
 
   for i, vals in enumerate(sellers_DF['beta_lock']):
@@ -1150,7 +1095,7 @@ def agent_status(sellers_DF, staking_pool, daily_reserve, seniors_staked,treasur
       if idx_period == diss_del[i] + 1:
         print('A dissolver gets their money back')
         sellers_DF.loc[i, 'status'] = 'trader'
-        sellers_DF.loc[i, 'Q_MOD'] = sellers_DF.loc[i, 'Q_s']
+        sellers_DF.loc[i, 'Q_TOK'] = sellers_DF.loc[i, 'Q_s']
         sellers_DF.loc[i, 'Q_s'] = 0
 
       #print('This is a staker with unlock product equal to: ', unlock)
@@ -1221,40 +1166,40 @@ initial_moderator_frame.columns = ['Reputation_Score','Level','Moderator #']
 # initial_moderator_frame.index.name = 'Moderator #'
 # initial_moderator_frame['Moderator #'] = initial_moderator_frame.index
 
-#Compute MOD staked or locked
+#Compute TOK staked or locked
 test_times = np.zeros((user_pool_number,), dtype = int)
-MOD_staked = np.zeros((user_pool_number,), dtype = int)
-MOD_locked = np.zeros((user_pool_number,), dtype = int)
+TOK_staked = np.zeros((user_pool_number,), dtype = int)
+TOK_locked = np.zeros((user_pool_number,), dtype = int)
 
 dimension = int(user_pool_number * senior_percentage)
-MOD_reward = np.zeros((dimension,), dtype = int)
-MOD_reward_junior = np.zeros((dimension,), dtype = int)
+TOK_reward = np.zeros((dimension,), dtype = int)
+TOK_reward_junior = np.zeros((dimension,), dtype = int)
 
 qualif = []
 delt= []
 #staked
 for i in range (user_pool_number):
   if level[i] == 'senior':
-    modstaked = aS * (reputation_score[i])**eta + abs(random.normalvariate(mu=0, sigma=1500))
-    #modstaked = aS * (reputation_score[i]) + abs(random.normalvariate(mu=0, sigma=1500))
+    TOKstaked = aS * (reputation_score[i])**eta + abs(random.normalvariate(mu=0, sigma=1500))
+    #TOKstaked = aS * (reputation_score[i]) + abs(random.normalvariate(mu=0, sigma=1500))
     temp1 = abs(random.normalvariate(mu=0, sigma=1500))
     delt.append(temp1)
     temp = aS * (reputation_score[i])**eta
     qualif.append(temp)
-    MOD_staked[i] = modstaked
+    TOK_staked[i] = TOKstaked
 
 #locked
 for i in range (user_pool_number):
   if level[i] == 'junior':
-    modlocked = aL * (reputation_score[i] - 20) + abs(random.normalvariate(mu = (reputation_score[i] - 20) , sigma=1))
-    MOD_locked[i] = modlocked / 2
-    MOD_reward_junior[i] = modlocked / 2
-new_rew = np.concatenate((MOD_reward_junior, MOD_reward))
+    TOKlocked = aL * (reputation_score[i] - 20) + abs(random.normalvariate(mu = (reputation_score[i] - 20) , sigma=1))
+    TOK_locked[i] = TOKlocked / 2
+    TOK_reward_junior[i] = TOKlocked / 2
+new_rew = np.concatenate((TOK_reward_junior, TOK_reward))
 
 initial_moderator_frame.insert(initial_moderator_frame.shape[1], 'test_times', test_times)
-initial_moderator_frame.insert(initial_moderator_frame.shape[1], 'MOD_staked', MOD_staked)
-initial_moderator_frame.insert(initial_moderator_frame.shape[1], 'MOD_locked', MOD_locked)
-initial_moderator_frame.insert(initial_moderator_frame.shape[1], 'MOD_reward', new_rew)
+initial_moderator_frame.insert(initial_moderator_frame.shape[1], 'TOK_staked', TOK_staked)
+initial_moderator_frame.insert(initial_moderator_frame.shape[1], 'TOK_locked', TOK_locked)
+initial_moderator_frame.insert(initial_moderator_frame.shape[1], 'TOK_reward', new_rew)
 
 #############################################################################
 
@@ -1267,7 +1212,7 @@ def generate_moderators ():
   while Nm % 2 != 1 :
     Nm = random.randint(3,9)
   # print (Nm)
-  task_moderator = pd.DataFrame(columns=['Reputation_Score', 'Moderator #','Level', 'test_times','MOD_staked', 'MOD_locked'])
+  task_moderator = pd.DataFrame(columns=['Reputation_Score', 'Moderator #','Level', 'test_times','TOK_staked', 'TOK_locked'])
   for i in range (Nm):
     index = random.randint(0,599)
     #print(moderator_frame.loc[index])
@@ -1310,7 +1255,7 @@ def evaluation(task_moderator, moderator_frame, Nm, Cs, rm, rt, rb, aS, eta, mul
   #Calculate reward
   reward = np.zeros((Nm,), dtype = float)
   total_correct_reputation = 0
-  #Ct = Nm*Cs*multiplier   # --> when task cost is fixed in $MOD
+  #Ct = Nm*Cs*multiplier   # --> when task cost is fixed in $TOK
   Ct = (task_cents/previous_price)*multiplier # --> when task cost is fixed in USD
   Qm = rm*Ct
   Qt = rt*Ct
@@ -1328,7 +1273,7 @@ def evaluation(task_moderator, moderator_frame, Nm, Cs, rm, rt, rb, aS, eta, mul
   for i in range (Nm):
     reward[i] = round(reward[i],1)
 
-  task_moderator.insert(task_moderator.shape[1], 'MOD_Reward', reward)
+  task_moderator.insert(task_moderator.shape[1], 'TOK_Reward', reward)
 
 
   #update reputation_score and new staked amount for seniors
@@ -1341,18 +1286,18 @@ def evaluation(task_moderator, moderator_frame, Nm, Cs, rm, rt, rb, aS, eta, mul
       id_moderator = task_moderator['Moderator #'].loc[i]
       # Updating moderator frame to add accumulated rewards:
       if task_moderator['Level'].loc[i]=='junior':
-        moderator_frame['MOD_locked'].loc[id_moderator] += reward[i]/2
-        moderator_frame['MOD_reward'].loc[id_moderator] += reward[i]/2
+        moderator_frame['TOK_locked'].loc[id_moderator] += reward[i]/2
+        moderator_frame['TOK_reward'].loc[id_moderator] += reward[i]/2
         track_liquid += reward[i]/2
       else:
-        moderator_frame['MOD_reward'].loc[id_moderator] += reward[i]
+        moderator_frame['TOK_reward'].loc[id_moderator] += reward[i]
         track_liquid += reward[i]
       # Determine if staked amount needs to increase:
       r_newRS = round(newRS, 1)
       f_newRS = math.floor(r_newRS)
       if newRS > 50.0 and r_newRS/f_newRS == 1.0:
         #print(r'Senior %s just got promoted and needs to stake more' %id_moderator)
-        moderator_frame['MOD_staked'].loc[i] = aS*(newRS**eta) + abs(random.normalvariate(mu=0, sigma=1500))
+        moderator_frame['TOK_staked'].loc[i] = aS*(newRS**eta) + abs(random.normalvariate(mu=0, sigma=1500))
     else:
       task_moderator['Reputation_Score'].loc[i] -= 0.1
 
@@ -1398,16 +1343,16 @@ def verification_work(Nt_min, Nt_max, Nt_steps, moderator_frame, track_liquid, p
     beginning_frame = pd.concat([beginning_frame,task_new], ignore_index = True)
     for i in range(beginning_frame.shape[0]):
       beginning_frame['Reputation_Score'].loc[i] = round(beginning_frame['Reputation_Score'].loc[i],2)
-  beginning_frame = beginning_frame[['task #','Moderator #','Reputation_Score','Level','test_times','MOD_staked','MOD_locked','Correct','MOD_Reward']]
-  MODcost = sum(cost)
+  beginning_frame = beginning_frame[['task #','Moderator #','Reputation_Score','Level','test_times','TOK_staked','TOK_locked','Correct','TOK_Reward']]
+  TOKcost = sum(cost)
 
-  return beginning_frame, new_moderator_frame, MODcost, Nt, new_track_liquid
+  return beginning_frame, new_moderator_frame, TOKcost, Nt, new_track_liquid
 #############################################################################
-#print('Total submission cost (MOD): ', MODcost)
-#print('Total verification rewards (MOD): ', MODrew)
-#print('What goes to treasury (MOD): ', MOD_treasury)
-#print('Amount of MOD burned in this period: ', MODbur)
-#print('Total MOD staked: ', seniors_total_staked)
+#print('Total submission cost (TOK): ', TOKcost)
+#print('Total verification rewards (TOK): ', TOKrew)
+#print('What goes to treasury (TOK): ', TOK_treasury)
+#print('Amount of TOK burned in this period: ', TOKbur)
+#print('Total TOK staked: ', seniors_total_staked)
 
 """## 3. Month 1 - Only buyers and ITE
 
@@ -1421,10 +1366,10 @@ def verification_work(Nt_min, Nt_max, Nt_steps, moderator_frame, track_liquid, p
 track_liquid = 0
 beginning_frame, new_moderator_frame, m1_cost, Nt, new_track_liquid = verification_work(Nt_min, Nt_max, Nt_steps, initial_moderator_frame, track_liquid, price[0])
 liquid_in_period.append(new_track_liquid)
-sum_senior_rewards = new_moderator_frame.loc[new_moderator_frame['Level'] == 'senior', 'MOD_reward'].sum()
+sum_senior_rewards = new_moderator_frame.loc[new_moderator_frame['Level'] == 'senior', 'TOK_reward'].sum()
 senior_reward.append(sum_senior_rewards)
-mean_senior_rewards = new_moderator_frame.loc[new_moderator_frame['Level'] == 'senior', 'MOD_reward'].mean()
-mean_junior_rewards = new_moderator_frame.loc[new_moderator_frame['Level'] == 'junior', 'MOD_reward'].mean()
+mean_senior_rewards = new_moderator_frame.loc[new_moderator_frame['Level'] == 'senior', 'TOK_reward'].mean()
+mean_junior_rewards = new_moderator_frame.loc[new_moderator_frame['Level'] == 'junior', 'TOK_reward'].mean()
 msenior_rew.append(mean_senior_rewards)
 mjunior_rew.append(mean_junior_rewards)
 number_tasks.append(Nt)
@@ -1432,18 +1377,18 @@ mode_cost.append(m1_cost)
 treasury.append(rt*m1_cost)
 burned.append(rb*m1_cost)
 rewards.append(rm*m1_cost)
-seniors_staked.append(new_moderator_frame['MOD_staked'].sum())
-mode_liquid.append(new_moderator_frame['MOD_reward'].sum())
-junior_locked = new_moderator_frame['MOD_locked'].sum()
+seniors_staked.append(new_moderator_frame['TOK_staked'].sum())
+mode_liquid.append(new_moderator_frame['TOK_reward'].sum())
+junior_locked = new_moderator_frame['TOK_locked'].sum()
 #display(new_moderator_frame)
 
-print('Total submission cost (MOD) in month 1: ', mode_cost[0])
-print('MOD liquid in month 1: ', mode_liquid[0])
-print('What goes to treasury (MOD) in month 1: ', treasury[0])
-print('Amount of MOD burned in month 1: ', burned[0])
-print('Total MOD staked in month 1: ', seniors_staked[0])
+print('Total submission cost (TOK) in month 1: ', mode_cost[0])
+print('TOK liquid in month 1: ', mode_liquid[0])
+print('What goes to treasury (TOK) in month 1: ', treasury[0])
+print('Amount of TOK burned in month 1: ', burned[0])
+print('Total TOK staked in month 1: ', seniors_staked[0])
 
-# Amount of MOD token taken from the ITE:
+# Amount of TOK token taken from the ITE:
 moderation_tokens = m1_cost + seniors_staked[0] - liquid_in_period[0] +junior_locked + burned[0]
 #moderation_tokens = seniors_staked[0] + junior_locked + burned[0]
 print('Moderation tokens: ', moderation_tokens)
@@ -1457,12 +1402,12 @@ buyers = generate_buyers(nb_mean, price, 0, QU_mean, QU_sd, alpha_loc,
 bidprice = buyers['bid_price']
 sellers = pd.DataFrame(bidprice, columns=['bid_price'])
 sellers.columns = ['ask_price']
-sellers["Q_MOD"]= endowment[0]
+sellers["Q_TOK"]= endowment[0]
 sellers['status'] = 'trader'
 #-------------------------------------------------------
 ## (3) calculate cumulative demand
 USDT = buyers['Q_USDT']
-buyers['QB_MOD'] = USDT/bidprice
+buyers['QB_TOK'] = USDT/bidprice
 sum_usdt = np.cumsum(buyers['Q_USDT'])
 demand = sum_usdt/buyers['bid_price']
 buyers['cumulative_demand'] = demand
@@ -1481,8 +1426,8 @@ print('Buyers: ',len(buyers))
 print(f"Buyer {buyer_idx+1} was the last to deal")
 print(f"The overhang was {eq_demand - eq_supply}, equilibrium price in this period is {equilibrium_price}")
 #print(f"and last sell price was {price_supply}")
-print(f"Cumulative demand is {round(eq_demand,2)} MOD")
-print(f"and Cumulative supply is {round(eq_supply, 2)} MOD.")
+print(f"Cumulative demand is {round(eq_demand,2)} TOK")
+print(f"and Cumulative supply is {round(eq_supply, 2)} TOK.")
 
 #---------------------------------
 # (6) Save Results and Update Agents
@@ -1543,8 +1488,8 @@ print(price)
 staking_pool = pd.DataFrame(res_13, columns=['rem_endow'])
 staking_pool.loc[36:47,'rem_endow'] = 0
 staking_pool['seniors_stake'] = 0
-staking_pool['sum_Q_s'] = 0 # sum of MOD staked by stakers
-staking_pool['sum_Q_all']= 0   # Sum of all MOD staked (endowment + stakers)
+staking_pool['sum_Q_s'] = 0 # sum of TOK staked by stakers
+staking_pool['sum_Q_all']= 0   # Sum of all TOK staked (endowment + stakers)
 staking_pool['number_stakers']=0  # number of stakers
 #staking_pool['cumsum_rem_endow'] = 0
 staking_pool['cumsum_Q_s'] = 0
@@ -1598,34 +1543,34 @@ for j in period:
   # (1) Run moderation process:
   #--------------------------------------------
   track_liquid = 0
-  beginning_frame, new_moderator_frame, MODcost, Nt, new_track_liquid = verification_work(Nt_min, Nt_max, Nt_steps, initial_moderator_frame, track_liquid, price[j-1])
+  beginning_frame, new_moderator_frame, TOKcost, Nt, new_track_liquid = verification_work(Nt_min, Nt_max, Nt_steps, initial_moderator_frame, track_liquid, price[j-1])
   liquid_in_period.append(new_track_liquid)
-  sum_senior_rewards = new_moderator_frame.loc[new_moderator_frame['Level'] == 'senior', 'MOD_reward'].sum()
+  sum_senior_rewards = new_moderator_frame.loc[new_moderator_frame['Level'] == 'senior', 'TOK_reward'].sum()
   senior_reward.append(sum_senior_rewards)
-  mean_senior_rewards = new_moderator_frame.loc[new_moderator_frame['Level'] == 'senior', 'MOD_reward'].mean()
-  mean_junior_rewards = new_moderator_frame.loc[new_moderator_frame['Level'] == 'junior', 'MOD_reward'].mean()
+  mean_senior_rewards = new_moderator_frame.loc[new_moderator_frame['Level'] == 'senior', 'TOK_reward'].mean()
+  mean_junior_rewards = new_moderator_frame.loc[new_moderator_frame['Level'] == 'junior', 'TOK_reward'].mean()
   msenior_rew.append(mean_senior_rewards)
   mjunior_rew.append(mean_junior_rewards)
   number_tasks.append(Nt)
-  mode_cost.append(MODcost)
-  treasury.append(rt*MODcost)
-  burned.append(rb*MODcost)
-  rewards.append(rm*MODcost)
-  seniors_staked.append(new_moderator_frame['MOD_staked'].sum())
-  mode_liquid.append(new_moderator_frame['MOD_reward'].sum())
-  mode_locked = new_moderator_frame['MOD_locked'].sum()
-  print('Total submission cost (MOD): ', mode_cost[j-1])
-  print('MOD liquid = Total verification rewards (MOD): ', mode_liquid[j-1])
-  print('What goes to treasury (MOD): ', treasury[j-1])
-  print('Amount of MOD burned in this period: ', burned[j-1])
-  print('Total MOD staked: ', seniors_staked[j-1])
+  mode_cost.append(TOKcost)
+  treasury.append(rt*TOKcost)
+  burned.append(rb*TOKcost)
+  rewards.append(rm*TOKcost)
+  seniors_staked.append(new_moderator_frame['TOK_staked'].sum())
+  mode_liquid.append(new_moderator_frame['TOK_reward'].sum())
+  mode_locked = new_moderator_frame['TOK_locked'].sum()
+  print('Total submission cost (TOK): ', mode_cost[j-1])
+  print('TOK liquid = Total verification rewards (TOK): ', mode_liquid[j-1])
+  print('What goes to treasury (TOK): ', treasury[j-1])
+  print('Amount of TOK burned in this period: ', burned[j-1])
+  print('Total TOK staked: ', seniors_staked[j-1])
   #moderation = burned[j-1] + seniors_staked[j-1] + mode_locked - mode_liquid[j-1]
-  #moderation = MODcost - liquid_in_period[j-1]
+  #moderation = TOKcost - liquid_in_period[j-1]
   moderation = burned[j-1]
   #old_liquid = m1_liquid #(take from day one)
   #old_staked = m1_staked #(ipso)
-  #total_liquid = sum(new_mod_frame['MOD_rewards'])
-  #total_staked = sum(new_mod_frame['MOD_staked'])
+  #total_liquid = sum(new_mod_frame['TOK_rewards'])
+  #total_staked = sum(new_mod_frame['TOK_staked'])
   #delta_liquid = new_liquid - old_liquid =
   #delta_staked = new_staked - old_staked
   #market.update(delta_liquid, delta_staked) (run simulation with updated macroeco parameters)
@@ -1670,7 +1615,7 @@ for j in period:
   #plot_alpha(buyers_DF,j)
   #plot_alpha(sellers_DF,j)
   #plot_usdt(buyers_DF,j)
-  #plot_MOD(sellers_DF,j)
+  #plot_TOK(sellers_DF,j)
   #alo(sellers_DF, j)
   #bun(sellers_DF,j)
   #loti(sellers_DF,j)
@@ -1704,10 +1649,10 @@ for j in period:
   buy = pd.DataFrame()
   sell = pd.DataFrame()
   buy['price'] = buyers_DF['bid_price']
-  buy['qty_buyers'] = buyers_DF['QB_MOD']
+  buy['qty_buyers'] = buyers_DF['QB_TOK']
   buy['cum_qty_buyers'] = buyers_DF['cumulative_demand']
   sell['price'] = sellers_DF['ask_price']
-  sell['qty_sellers'] = sellers_DF['Q_MOD']
+  sell['qty_sellers'] = sellers_DF['Q_TOK']
   sell['cum_qty_sellers'] = sellers_DF['cumulative_supply']
   market=pd.merge(buy.sort_values("price", ascending=True).reset_index(drop=True),
                 sell, on="price", how ="outer", suffixes=
@@ -1755,7 +1700,7 @@ for j in period:
   #=================================================
 
 #-------------------------------------------------------------------------------
-# Cumulative stakers and staked MOD
+# Cumulative stakers and staked TOK
 c_stakers = np.cumsum(staking_pool['number_stakers'])
 c_stk_all = np.cumsum(staking_pool['cumsum_Q_all'])
 c_endow = np.cumsum(staking_pool['rem_endow'])
